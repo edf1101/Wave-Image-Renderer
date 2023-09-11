@@ -28,5 +28,7 @@ Given the lines are comprised of many overlayed varying radius spheres it is als
 
 <img src="https://github.com/edf1101/Wave-Image-Renderer/blob/main/repoImages/einstein%20dots.png" width="300" height="400"> <img src="https://github.com/edf1101/Wave-Image-Renderer/blob/main/repoImages/skiing%20dots.png" width="600" height="400"> 
 
-Although the monotone look is more striking it is also possible to colorise the effect. Given the lines already represent intensity the intensity of all colours should be the same high level. This can be achieved by using HSV colours where the 'value' component is set to 1.0 
+Although the monotone look is more striking it is also possible to colorise the effect. Given the lines already represent intensity the intensity of all colours should be the same high level. This can be achieved by using HSV colours where the 'value' component is set to 1.0 . As seen below
+
+
 <img src="https://github.com/edf1101/Wave-Image-Renderer/blob/main/repoImages/color%20waves.png" width="300" height="400">
