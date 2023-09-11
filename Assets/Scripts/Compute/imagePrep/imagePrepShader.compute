@@ -1,0 +1,80 @@
+#pragma kernel CSMain
+
+
+Texture2D<float4> inputImg;
+
+RWTexture2D<float4> intensityOutput; // always need intensity in B/W
+RWTexture2D<float4> colorOutput; // black if greyscale else full color
+
+int downscaleMult; // how much to downscale the texture by
+bool isGreyscale; // is it greyscale?
+
+#define groupSize 8
+
+
+// converts rgb colors to greyscale
+float4 rgbToGrey(float4 _color){
+
+    float value = 0.299*_color.r + 0.587*_color.g + 0.114*_color.b;
+    return float4(value,value,value,_color.a);
+}
+
+// converts any color to its highest intensity version
+float4 fullBrightnessColor(float4 _col){
+    float maxIntensity= max(max(_col.r,_col.g),_col.b);
+    float mult= 1.0/maxIntensity;
+
+    return float4(_col.r*mult,_col.g*mult,_col.b*mult,_col.a);
+
+}
+
+// gets the average color in a tile
+float4 getAvgColInTile(int2 tileIndx){
+
+    float4 sum;
+    int count;
+
+    for(int x = tileIndx.x*downscaleMult; x < (tileIndx.x+1)*downscaleMult; x++){
+
+        for(int y = tileIndx.y*downscaleMult; y < (tileIndx.y+1)*downscaleMult; y++){
+
+            sum+= inputImg[int2(x,y)]; // adds the current color in the input image
+            count++; // adds onto the count
+        }
+
+    }
+    return sum/float(count);
+}
+
+
+// fills a certain group tile in with a color
+void fillTile(int2 tileIndx){
+
+    // sort out colouring
+    float4 originalCol= getAvgColInTile(tileIndx);
+    float4 intensityCol= rgbToGrey(originalCol);
+
+    float4 coloring;
+    if(!isGreyscale)
+        coloring=fullBrightnessColor(originalCol);
+
+    for(int x = tileIndx.x*downscaleMult; x < (tileIndx.x+1)*downscaleMult; x++){
+
+
+        for( int y = tileIndx.y*downscaleMult; y < (tileIndx.y+1)*downscaleMult; y++){
+            colorOutput[int2(x,y)]=coloring;
+            intensityOutput[int2(x,y)]=intensityCol;
+        }
+    }
+
+}
+
+
+
+
+[numthreads(groupSize,groupSize,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+
+    fillTile(id.xy);
+}

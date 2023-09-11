@@ -1,64 +1,66 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 /* 
  * Code by Ed F
  * www.github.com/edf1101
  */
 
-public class imageRenderer : MonoBehaviour
+public class imageRenderer 
 {
-    [Header("Image Settings")]
-    [SerializeField] private Texture inputImage;
 
+    // Textures for intensity and output
+    private RenderTexture intensityOutput;
+    private RenderTexture colorOutput;
 
-    [Header("Shader References")]
-    [SerializeField] private ComputeShader imagePrepShader;
-
-
-    // Component refernces (found in void start)
-    private RawImage rawImgRef;
-    private RectTransform rawImgRect;
-
-    private void Start() // called before first frame
+    // set the input image
+    private Texture inputImage;
+    public void setImage(Texture _img)
     {
-        // Get the raw img components required on start
-        rawImgRef = GetComponent<RawImage>();
-        rawImgRect = GetComponent<RectTransform>();
-
-        // Set the compute shaders statically for the shaders
-        imagePrepHelper.setShader(imagePrepShader);
-
-
-
-        
-        convertImage(); // convert the image!
-
-    }
-
-    
-    private void setImage(Texture _img) {
-
-        // calculate aspect ratio for input image (width/height)
-        int width = _img.width;
-        int height = _img.height;
-        float aspRatio = width / (float)height;
-
-        float rawImgHeight = rawImgRect.sizeDelta.y;
-
-        // modify the width of the raw img so its the aspect ratio* height
-        rawImgRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal,aspRatio*rawImgHeight);
-
-        // set the image
-        rawImgRef.texture = _img;
-
+        inputImage = _img;
     }
 
 
-    private void convertImage()
+    // variables for image preparation 
+    private int downscaleMult;
+    private int blurRadius;
+    private bool isGreyscale;
+    // and their setter
+    public void setPrepVariables(int _downscale, int _blurRad,bool _isGreyscale)
     {
-        setImage(inputImage);
+        downscaleMult = _downscale;
+        blurRadius = _blurRad;
+        isGreyscale = _isGreyscale;
+    }
+
+    // preps the image for converting
+    public void prepareImage()
+    {
+        // create preparation helper
+        imagePrepHelper IPH = new imagePrepHelper(isGreyscale, downscaleMult);
+        IPH.prepImage(inputImage);
+
+        intensityOutput = IPH.getIntensityOutput();
+        colorOutput = IPH.getColourOutput();
+
+        // create blur helper
+        imageBlurHelper IBH = new imageBlurHelper();
+        // blur intensity 
+        intensityOutput = IBH.blurTexture(intensityOutput, blurRadius);
+        if (!isGreyscale) // if its not greyscale then blur colors
+            colorOutput = IBH.blurTexture(colorOutput, blurRadius);
+
+    }
+
+    // getters for the textures 
+    public Texture getIntensityOutput()
+    {
+        return intensityOutput;
+    }
+
+    public Texture getColorOutput()
+    {
+        return colorOutput;
     }
 }
