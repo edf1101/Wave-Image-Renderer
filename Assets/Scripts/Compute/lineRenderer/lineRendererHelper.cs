@@ -25,9 +25,9 @@ public class lineRendererHelper
     private int canvasUpscale;
     private float waveAmplitude;
     private Vector2 radiusRange;
-    private Vector2 frequencyRange;
+    private Vector2 WLRange;
     // setter for above variables
-    public lineRendererHelper(float _ang, float _lineIntervals, float _circIntervals, int _canvUpscale, float _wavAmp, Vector2 _radRange, Vector2 _freqRange)
+    public lineRendererHelper(float _ang, float _lineIntervals, float _circIntervals, int _canvUpscale, float _wavAmp, Vector2 _radRange, Vector2 _WLRange)
     {
         angle = _ang;
         lineIntervals = _lineIntervals;
@@ -35,7 +35,7 @@ public class lineRendererHelper
         canvasUpscale = _canvUpscale;
         waveAmplitude = _wavAmp;
         radiusRange = _radRange;
-        frequencyRange = _freqRange;
+        WLRange = _WLRange;
     }
     
     private static ComputeShader myShader; // the compute shader we'll use
@@ -56,7 +56,8 @@ public class lineRendererHelper
     }
 
     public RenderTexture renderImage()
-    {
+    { 
+
         // Set up image sizes
         inpImgSize = new Vector2(intensityTex.width, intensityTex.height);
         outImgSize = inpImgSize * canvasUpscale;
@@ -75,6 +76,11 @@ public class lineRendererHelper
         
         myShader.SetTexture(1, "outputImage", outputImage);
 
+        // give it the input textures
+        myShader.SetTexture(1, "inputIntensity", intensityTex);
+        myShader.SetTexture(1, "inputColor", colorTex);
+
+
         // set variables needed
         myShader.SetInt("canvasMult", canvasUpscale);
         myShader.SetVector("outImageSize", outImgSize);
@@ -82,6 +88,8 @@ public class lineRendererHelper
         myShader.SetFloat("tanOfAngle", Mathf.Tan(Mathf.Deg2Rad * angle));
         myShader.SetFloat("circleIntervals", circleInterval);
         myShader.SetVector("radiusRange", radiusRange);
+        myShader.SetVector("WLRange", WLRange);
+        myShader.SetFloat("waveAmplitude", waveAmplitude);
 
         if(lineIntervals==0) // error checking if lineIntervals=0 then it would crash
         {

@@ -16,23 +16,24 @@ bool isGreyscale; // is it greyscale?
 float4 rgbToGrey(float4 _color){
 
     float value = 0.299*_color.r + 0.587*_color.g + 0.114*_color.b;
-    return float4(value,value,value,_color.a);
+    return float4(value,value,value,1);
 }
 
 // converts any color to its highest intensity version
 float4 fullBrightnessColor(float4 _col){
-    float maxIntensity= max(max(_col.r,_col.g),_col.b);
+
+    float maxIntensity= max(max(_col.r,_col.g),_col.b); 
     float mult= 1.0/maxIntensity;
 
-    return float4(_col.r*mult,_col.g*mult,_col.b*mult,_col.a);
+    return float4(_col.r*mult,_col.g*mult,_col.b*mult,1);
 
 }
 
 // gets the average color in a tile
 float4 getAvgColInTile(int2 tileIndx){
 
-    float4 sum;
-    int count;
+    float4 sum; // sum of colours
+    int count; // how many samples we have taken so we can average
 
     for(int x = tileIndx.x*downscaleMult; x < (tileIndx.x+1)*downscaleMult; x++){
 
@@ -54,14 +55,16 @@ void fillTile(int2 tileIndx){
     float4 originalCol= getAvgColInTile(tileIndx);
     float4 intensityCol= rgbToGrey(originalCol);
 
-    float4 coloring;
+    float4 coloring = float4(1,1,1,1); // if greyscale then colour shold be white
     if(!isGreyscale)
         coloring=fullBrightnessColor(originalCol);
 
+    // go through each pixel in the tile
     for(int x = tileIndx.x*downscaleMult; x < (tileIndx.x+1)*downscaleMult; x++){
 
 
         for( int y = tileIndx.y*downscaleMult; y < (tileIndx.y+1)*downscaleMult; y++){
+            // and assign its colour
             colorOutput[int2(x,y)]=coloring;
             intensityOutput[int2(x,y)]=intensityCol;
         }
@@ -76,5 +79,5 @@ void fillTile(int2 tileIndx){
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
 
-    fillTile(id.xy);
+    fillTile(id.xy); // fill all the tiles
 }

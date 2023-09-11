@@ -818,16 +818,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08e7b6372262b4d5e9f6c0fa2c4b46e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputImage: {fileID: 2800000, guid: 7139e23e6708d4f3f99eab3464162f7b, type: 3}
-  isGreyScale: 0
+  inputImage: {fileID: 2800000, guid: 9880849e477c04c7399763ef136c93df, type: 3}
+  saving: 0
+  savePath: /Users/edfillingham/Downloads/test.png
+  isGreyScale: 1
   downscaleMult: 4
   blurRadius: 21
   angle: 45
-  lineIntervals: 20
-  circleInterval: 5
-  canvasUpscale: 1
+  lineIntervals: 30
+  circleInterval: 0.1
+  canvasUpscale: 2
   waveAmplitude: 20
-  radiusRange: {x: 5, y: 15}
+  radiusRange: {x: 0.4, y: 5}
   frequencyRange: {x: 0.01, y: 1}
   imagePrepShader: {fileID: 7200000, guid: 2fa70b70546864167b2fd2567b448ed7, type: 3}
   imageBlurShader: {fileID: 7200000, guid: b083b8529f0cf4f3aa07b4ad9d843075, type: 3}

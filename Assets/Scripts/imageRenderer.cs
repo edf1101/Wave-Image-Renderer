@@ -19,10 +19,10 @@ public class imageRenderer
     private int canvasUpscale;
     private float waveAmplitude;
     private Vector2 radiusRange;
-    private Vector2 frequencyRange;
+    private Vector2 WLRange;
 
     // setter for above variables
-    public void setLineRenderingVariables(float _ang, float _lineIntervals,float _circIntervals,int _canvUpscale, float _wavAmp , Vector2 _radRange, Vector2 _freqRange)
+    public void setLineRenderingVariables(float _ang, float _lineIntervals,float _circIntervals,int _canvUpscale, float _wavAmp , Vector2 _radRange, Vector2 _WLRange)
     {
         angle = _ang;
         lineIntervals = _lineIntervals;
@@ -30,7 +30,7 @@ public class imageRenderer
         canvasUpscale = _canvUpscale;
         waveAmplitude = _wavAmp;
         radiusRange = _radRange;
-        frequencyRange = _freqRange;
+        WLRange = _WLRange;
     }
 
     // Textures for intensity and output
@@ -79,7 +79,7 @@ public class imageRenderer
 
     public void renderImage()
     {
-        LRH = new lineRendererHelper(angle,lineIntervals,circleInterval,canvasUpscale,waveAmplitude,radiusRange,frequencyRange);
+        LRH = new lineRendererHelper(angle,lineIntervals,circleInterval,canvasUpscale,waveAmplitude,radiusRange, WLRange);
         LRH.setInputTextures(intensityOutput, colorOutput);
 
         lineOutput = LRH.renderImage();

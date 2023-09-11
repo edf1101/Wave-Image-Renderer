@@ -15,12 +15,14 @@ float2 inImageSize;
 float tanOfAngle; // gets calculated once in cssharp
 float lineIntervals; // gap between lines on edges
 float2 radiusRange; // the range of possible radii
+float2 WLRange; // the range of possible wavelengths
 float circleIntervals; // gap between circles drawn
 int canvasMult; // how much bigger canvas is than data fed in (upscaling)
 float minY; // minimum yIntercept
+float waveAmplitude; // amplitude of sinWaves
 
 // draws a circle at a point on screen
-void drawCircle(int2 position,int radius,float4 color){
+void drawCircle(int2 position,float radius,float4 color){
 
     // multiply position and radius by canvas upscale ratio so they scale automatically
     position*=canvasMult;
@@ -61,6 +63,8 @@ void drawLine(float2 _startPoint, float2 _endPoint){
     // calculate the distance between all the points
     float2 dif = _endPoint-_startPoint;
     float distance= sqrt( (dif.x*dif.x) + (dif.y*dif.y));
+    float2 perp = normalize(float2(-dif.y,dif.x)); // normalised perpendicular vector
+
 
     // go along the line in intervals of circleIntervals
     for(float i =0; i<distance; i+= circleIntervals){
@@ -68,7 +72,21 @@ void drawLine(float2 _startPoint, float2 _endPoint){
         float percentage = i/distance;
         float2 position = _startPoint + (dif*percentage); // lerp between start and end
 
-        drawCircle(position,radiusRange.x,float4(1,1,1,1));
+        
+
+        // get intensity and color at this postition
+        float intensity = inputIntensity[position].r;
+        float4 imgColor = inputColor[position];
+
+        float lerpedRadius = radiusRange.x +(radiusRange.y-radiusRange.x)*intensity;
+        float lerpWavelength = WLRange.x + (WLRange.y-WLRange.x)*intensity;
+
+        // calculate the offset from sin wave
+        float freq= 1/lerpWavelength;
+        float amplitude = sin(freq*i)*waveAmplitude;
+        float2 offset = perp*amplitude;
+
+        drawCircle(position+offset,lerpedRadius,imgColor);
     }
 
 }

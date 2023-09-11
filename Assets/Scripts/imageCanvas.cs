@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Diagnostics;
+using static UnityEngine.UIElements.UxmlAttributeDescription;
 
 /* 
  * Code by Ed F
@@ -13,6 +14,8 @@ public class imageCanvas : MonoBehaviour
 {
     [Header("Image Settings")]
     [SerializeField] private Texture inputImage;
+    [SerializeField] private bool saving;
+    [SerializeField] private string savePath;
 
 
     [Header("Image Preparation Settings")]
@@ -29,7 +32,7 @@ public class imageCanvas : MonoBehaviour
     [SerializeField] private int canvasUpscale;
     [SerializeField] private float waveAmplitude;
     [SerializeField] private Vector2 radiusRange;
-    [SerializeField] private Vector2 frequencyRange;
+    [SerializeField] private Vector2 wavelengthRange;
 
 
     [Header("Shader References")]
@@ -92,7 +95,7 @@ public class imageCanvas : MonoBehaviour
         // setup variables neede in myRenderer
         myRenderer.setImage(inputImage);
         myRenderer.setPrepVariables(downscaleMult, blurRadius, isGreyScale);
-        myRenderer.setLineRenderingVariables(angle, lineIntervals, circleInterval, canvasUpscale, waveAmplitude, radiusRange, frequencyRange);
+        myRenderer.setLineRenderingVariables(angle, lineIntervals, circleInterval, canvasUpscale, waveAmplitude, radiusRange, wavelengthRange);
 
 
         // prepare the image ie downscale + blur
@@ -105,7 +108,25 @@ public class imageCanvas : MonoBehaviour
 
         // set the image
         setImage(debugTex);
+
+        if (saving)
+            SaveTexture(debugTex);
+        
        
+    }
+    private void SaveTexture(RenderTexture rt)
+    {
+        byte[] bytes = toTexture2D(rt).EncodeToPNG();
+        System.IO.File.WriteAllBytes(savePath, bytes);
+    }
+
+    private Texture2D toTexture2D(RenderTexture rTex)
+    {
+        Texture2D tex = new Texture2D(rTex.width, rTex.height, TextureFormat.RGB24, false);
+        RenderTexture.active = rTex;
+        tex.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
+        tex.Apply();
+        return tex;
     }
 
     private void OnValidate() // update the image each time a setting is changed
