@@ -1,0 +1,126 @@
+#pragma kernel setBackground
+#pragma kernel mainLines
+
+
+
+RWTexture2D<float4> outputImage; // output texture
+
+// Textures for data coming in
+RWTexture2D<float4> inputIntensity;
+RWTexture2D<float4> inputColor;
+
+// line settingns
+float2 outImageSize;
+float2 inImageSize;
+float tanOfAngle; // gets calculated once in cssharp
+float lineIntervals; // gap between lines on edges
+float2 radiusRange; // the range of possible radii
+float circleIntervals; // gap between circles drawn
+int canvasMult; // how much bigger canvas is than data fed in (upscaling)
+float minY; // minimum yIntercept
+
+// draws a circle at a point on screen
+void drawCircle(int2 position,int radius,float4 color){
+
+    // multiply position and radius by canvas upscale ratio so they scale automatically
+    position*=canvasMult;
+    radius*=canvasMult;
+
+    // iterate through all positions in square radius
+    for(int x=position.x-radius;x<position.x+radius;x++){
+        for(int y=position.y-radius;y<position.y+radius;y++){
+
+            // go to next iteration if this is outside image bounds
+            if(x<0 || y<0 || y>=outImageSize.y || x>=outImageSize.x)
+                continue;
+
+            // This code actually handles drawing
+
+            // calculate the square distance from the center
+            float disSqr = pow(x-position.x,2) + pow(y-position.y,2);
+            if(disSqr<=pow(radius,2)) // if its smaller/equal to sqr radius then in circle
+                outputImage[int2(x,y)]= color;
+
+            // cheaper to do sqr so we dont have to sqrt
+        }
+    }
+}
+
+float2 getEndpoint(float _startY){
+
+    if((inImageSize.y-_startY)/tanOfAngle < inImageSize.x) // hit top wall
+        return float2((inImageSize.y-_startY)/tanOfAngle,inImageSize.y);
+
+    else // hit right wall
+        return float2(inImageSize.x,_startY +(tanOfAngle * inImageSize.x));
+}
+
+// given a start and endpoint draws a line between
+void drawLine(float2 _startPoint, float2 _endPoint){
+     
+    // calculate the distance between all the points
+    float2 dif = _endPoint-_startPoint;
+    float distance= sqrt( (dif.x*dif.x) + (dif.y*dif.y));
+
+    // go along the line in intervals of circleIntervals
+    for(float i =0; i<distance; i+= circleIntervals){
+
+        float percentage = i/distance;
+        float2 position = _startPoint + (dif*percentage); // lerp between start and end
+
+        drawCircle(position,radiusRange.x,float4(1,1,1,1));
+    }
+
+}
+
+// checks if a line is valid
+bool validLine(float2 _start, float2 _end){
+
+    if (_end.x < 0 || _end.y < 0 || _end.x > inImageSize.x || _end.y > inImageSize.y)
+        return false;
+        
+
+    if (_start.x < 0 || _start.y < 0 || _start.y > inImageSize.y || _start.x > inImageSize.x)
+        return false;
+        
+
+    float2 delta = _end - _start;
+    float deltaMagnitudeSqr = (delta.x*delta.x)+(delta.y*delta.y);
+    if (deltaMagnitudeSqr < 4 || (_start.x<1&&_end.x<1) || (_start.y < 1 && _end.y < 1))
+        return false;
+
+    if ((_start.x > inImageSize.x - 1 && _start.x > inImageSize.x - 1) || (_start.y > inImageSize.y - 1 && _start.y > inImageSize.y - 1))
+        return false;
+
+
+    return true;
+}
+
+
+// This code simply sets the background to black
+[numthreads(16,16,1)]
+void setBackground (uint3 id : SV_DispatchThreadID)
+{
+    outputImage[id.xy] = float4(0,0,0,1);
+}
+
+
+[numthreads(1,1,1)]
+void mainLines (uint3 id : SV_DispatchThreadID)
+{
+    float startYIntercept = minY+ (id.x*lineIntervals); // where it starts at
+
+    float2 endPosition = getEndpoint(startYIntercept); // where the line finishes
+
+    // assumes startYIntercept above 0 and therefore start point.y >=0
+    float2 startPosition = float2(0,startYIntercept);
+
+    if(startYIntercept<0) // if startY below 0 find where it intersects x axis and start there
+        startPosition= float2(-startYIntercept/tanOfAngle,0);
+
+    // we now know where every line starts and finishes
+
+    // check the line is valid then draw it
+    if(validLine(startPosition,endPosition))
+        drawLine(startPosition, endPosition);
+}

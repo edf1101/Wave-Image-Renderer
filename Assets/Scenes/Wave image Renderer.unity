@@ -820,10 +820,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputImage: {fileID: 2800000, guid: 7139e23e6708d4f3f99eab3464162f7b, type: 3}
   isGreyScale: 0
-  downscaleMult: 2
-  blurRadius: 11
+  downscaleMult: 4
+  blurRadius: 21
+  angle: 45
+  lineIntervals: 20
+  circleInterval: 5
+  canvasUpscale: 1
+  waveAmplitude: 20
+  radiusRange: {x: 5, y: 15}
+  frequencyRange: {x: 0.01, y: 1}
   imagePrepShader: {fileID: 7200000, guid: 2fa70b70546864167b2fd2567b448ed7, type: 3}
   imageBlurShader: {fileID: 7200000, guid: b083b8529f0cf4f3aa07b4ad9d843075, type: 3}
+  lineRendererShader: {fileID: 7200000, guid: 1363fd3fef3064a11a0fb7e673531d53, type: 3}
   debugTex: {fileID: 0}
 --- !u!114 &1765730601
 MonoBehaviour:

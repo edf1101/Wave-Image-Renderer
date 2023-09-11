@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Diagnostics;
 
 /* 
  * Code by Ed F
@@ -19,9 +20,22 @@ public class imageCanvas : MonoBehaviour
     [SerializeField] private int downscaleMult;
     [SerializeField] private int blurRadius;
 
+    [Header("Line Settings")]
+    [Range(0, 89.999f)] [SerializeField] private float angle;
+    [SerializeField] private float lineIntervals;
+
+    [Header("Rendering settings")]
+    [SerializeField] private float circleInterval;
+    [SerializeField] private int canvasUpscale;
+    [SerializeField] private float waveAmplitude;
+    [SerializeField] private Vector2 radiusRange;
+    [SerializeField] private Vector2 frequencyRange;
+
+
     [Header("Shader References")]
     [SerializeField] private ComputeShader imagePrepShader;
     [SerializeField] private ComputeShader imageBlurShader;
+    [SerializeField] private ComputeShader lineRendererShader;
 
     public RenderTexture debugTex;
 
@@ -30,6 +44,8 @@ public class imageCanvas : MonoBehaviour
     private RectTransform rawImgRect;
 
     private imageRenderer myRenderer; // class to help render images
+
+    private bool started = false;
 
     private void Start() // called before first frame
     {
@@ -40,10 +56,12 @@ public class imageCanvas : MonoBehaviour
         // Set the compute shaders statically for the shaders
         imagePrepHelper.setShader(imagePrepShader);
         imageBlurHelper.setShader(imageBlurShader);
+        lineRendererHelper.setShader(lineRendererShader);
 
         // setup myRenderer
         myRenderer = new imageRenderer();
 
+        started = true;
         
         convertImage(); // convert the image!
 
@@ -70,13 +88,31 @@ public class imageCanvas : MonoBehaviour
     // converts the image using imageRenderer class
     private void convertImage()
     {
-        // setup variables in myRendererer
+      
+        // setup variables neede in myRenderer
         myRenderer.setImage(inputImage);
         myRenderer.setPrepVariables(downscaleMult, blurRadius, isGreyScale);
+        myRenderer.setLineRenderingVariables(angle, lineIntervals, circleInterval, canvasUpscale, waveAmplitude, radiusRange, frequencyRange);
 
+
+        // prepare the image ie downscale + blur
         myRenderer.prepareImage();
 
+        // render it 
+        myRenderer.renderImage();
 
-        setImage(myRenderer.getIntensityOutput());
+        debugTex = (RenderTexture)myRenderer.getLineOutput();
+
+        // set the image
+        setImage(debugTex);
+       
+    }
+
+    private void OnValidate() // update the image each time a setting is changed
+    {
+        if(Application.isPlaying && started)
+        {
+            convertImage();
+        }
     }
 }

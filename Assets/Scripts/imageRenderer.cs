@@ -10,9 +10,33 @@ using UnityEngine;
 public class imageRenderer 
 {
 
+    private lineRendererHelper LRH; // class for line rendering
+
+    // variables and settings for line rendering 
+    private float angle;
+    private float lineIntervals;
+    private float circleInterval;
+    private int canvasUpscale;
+    private float waveAmplitude;
+    private Vector2 radiusRange;
+    private Vector2 frequencyRange;
+
+    // setter for above variables
+    public void setLineRenderingVariables(float _ang, float _lineIntervals,float _circIntervals,int _canvUpscale, float _wavAmp , Vector2 _radRange, Vector2 _freqRange)
+    {
+        angle = _ang;
+        lineIntervals = _lineIntervals;
+        circleInterval = _circIntervals;
+        canvasUpscale = _canvUpscale;
+        waveAmplitude = _wavAmp;
+        radiusRange = _radRange;
+        frequencyRange = _freqRange;
+    }
+
     // Textures for intensity and output
     private RenderTexture intensityOutput;
     private RenderTexture colorOutput;
+    private RenderTexture lineOutput;
 
     // set the input image
     private Texture inputImage;
@@ -53,6 +77,15 @@ public class imageRenderer
 
     }
 
+    public void renderImage()
+    {
+        LRH = new lineRendererHelper(angle,lineIntervals,circleInterval,canvasUpscale,waveAmplitude,radiusRange,frequencyRange);
+        LRH.setInputTextures(intensityOutput, colorOutput);
+
+        lineOutput = LRH.renderImage();
+    }
+
+
     // getters for the textures 
     public Texture getIntensityOutput()
     {
@@ -62,5 +95,10 @@ public class imageRenderer
     public Texture getColorOutput()
     {
         return colorOutput;
+    }
+
+    public Texture getLineOutput()
+    {
+        return lineOutput;
     }
 }
