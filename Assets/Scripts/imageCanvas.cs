@@ -1,6 +1,10 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
+using System.Diagnostics;
+using static UnityEngine.UIElements.UxmlAttributeDescription;
+
 /* 
  * Code by Ed F
  * www.github.com/edf1101
@@ -10,6 +14,7 @@ public class imageCanvas : MonoBehaviour
 {
     [Header("Image Settings")]
     [SerializeField] private Texture inputImage;
+    [SerializeField] private bool saving;
     [SerializeField] private string savePath;
 
 
@@ -35,23 +40,7 @@ public class imageCanvas : MonoBehaviour
     [SerializeField] private ComputeShader imageBlurShader;
     [SerializeField] private ComputeShader lineRendererShader;
 
-
-
-    [Header("UI Settings refernces")]
-    [SerializeField] private Toggle greyscaleToggle;
-    [SerializeField] private Slider downscalingSlider;
-    [SerializeField] private Slider blurSlider;
-    [SerializeField] private Slider lineAngleSlider;
-    [SerializeField] private Slider lineSpacingSlider;
-    [SerializeField] private Slider circleSpacingSlider;
-    [SerializeField] private Slider canvasUpscaleSlider;
-    [SerializeField] private Slider waveAmplitudeSlider;
-    [SerializeField] private TMP_InputField radiusLow;
-    [SerializeField] private TMP_InputField radiusHigh;
-    [SerializeField] private TMP_InputField wlLow;
-    [SerializeField] private TMP_InputField wlHigh;
-
-    private RenderTexture finalImg;
+    public RenderTexture debugTex;
 
     // Component refernces (found in void start)
     private RawImage rawImgRef;
@@ -60,8 +49,6 @@ public class imageCanvas : MonoBehaviour
     private imageRenderer myRenderer; // class to help render images
 
     private bool started = false;
-
-   
 
     private void Start() // called before first frame
     {
@@ -79,12 +66,11 @@ public class imageCanvas : MonoBehaviour
 
         started = true;
         
-        //convertImage(); // convert the image!
+        convertImage(); // convert the image!
 
     }
 
-
-    // sets the image onto the display (mainly handles aspect ratios etc)
+    
     private void setImage(Texture _img) {
 
         // calculate aspect ratio for input image (width/height)
@@ -105,9 +91,7 @@ public class imageCanvas : MonoBehaviour
     // converts the image using imageRenderer class
     private void convertImage()
     {
-        //update parameters according to UI settings
-        updateSettings();
-
+      
         // setup variables neede in myRenderer
         myRenderer.setImage(inputImage);
         myRenderer.setPrepVariables(downscaleMult, blurRadius, isGreyScale);
@@ -120,56 +104,36 @@ public class imageCanvas : MonoBehaviour
         // render it 
         myRenderer.renderImage();
 
-        finalImg = (RenderTexture)myRenderer.getLineOutput();
+        debugTex = (RenderTexture)myRenderer.getLineOutput();
 
         // set the image
-        setImage(finalImg);
- 
+        setImage(debugTex);
+
+        if (saving)
+            SaveTexture(debugTex);
+        
+       
+    }
+    private void SaveTexture(RenderTexture rt)
+    {
+        byte[] bytes = toTexture2D(rt).EncodeToPNG();
+        System.IO.File.WriteAllBytes(savePath, bytes);
     }
 
- 
-   
-
-    private void updateSettings()
+    private Texture2D toTexture2D(RenderTexture rTex)
     {
-        isGreyScale = greyscaleToggle.isOn;
-        downscaleMult = (int)downscalingSlider.value;
-        blurRadius = (int)blurSlider.value;
-        angle = lineAngleSlider.value;
-        lineIntervals = lineSpacingSlider.value;
-        circleInterval = circleSpacingSlider.value;
-        canvasUpscale = (int)canvasUpscaleSlider.value;
-        waveAmplitude = waveAmplitudeSlider.value;
-        radiusRange = new Vector2(float.Parse(radiusLow.text), float.Parse(radiusHigh.text));
-        wavelengthRange = new Vector2(float.Parse(wlLow.text), float.Parse(wlHigh.text));
+        Texture2D tex = new Texture2D(rTex.width, rTex.height, TextureFormat.RGB24, false);
+        RenderTexture.active = rTex;
+        tex.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
+        tex.Apply();
+        return tex;
     }
 
-    public void makeImage() // basically calls convert image but this is public and does a check
+    private void OnValidate() // update the image each time a setting is changed
     {
-        if (inputImage != null)
+        if(Application.isPlaying && started)
         {
             convertImage();
         }
-
     }
-
-    // opens image
-    public void openImage()
-    {
-        inputImage = (Texture)imageFileHandler.importImage();
-        makeImage();
-    }
-
-    // saves image
-    public void saveImage()
-    {
-        imageFileHandler.saveImage(finalImg);
-    }
-
-    // closes app
-    public void closeApp()
-    {
-        Application.Quit();
-    }
-
 }
