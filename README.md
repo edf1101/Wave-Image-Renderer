@@ -1,6 +1,6 @@
 # Wave Image Renderer
 
-<img src="https://github.com/edf1101/Wave-Image-Renderer/blob/main/repoImages/tree.png" width="450" height="260"> <img src="https://github.com/edf1101/Wave-Image-Renderer/blob/main/repoImages/wave.png" width="450" height="260">
+<img src="https://github.com/edf1101/Wave-Image-Renderer/blob/main/repoImages/tree.png" width="400" height="260"> <img src="https://github.com/edf1101/Wave-Image-Renderer/blob/main/repoImages/wave.png" width="400" height="260">
 
 A program converting regular images into an interesting art style consisting of many different lines of varying thickness and frequencies to convey color intensity.
 
