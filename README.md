@@ -1,10 +1,12 @@
 # Wave Image Renderer
 
+<img src="https://github.com/edf1101/Wave-Image-Renderer/blob/main/repoImages/tree.png" width="450" height="260"> <img src="https://github.com/edf1101/Wave-Image-Renderer/blob/main/repoImages/wave.png" width="450" height="260">
+
 A program converting regular images into an interesting art style consisting of many different lines of varying thickness and frequencies to convey color intensity.
 
 The user can upload their image into the software where they can adjust the image generation settings before saving the newly generated image. 
 
-The project also has the potential to render video / gameplay in this way although this may not be very speed effective.
+The project also has the potential to render video / gameplay in this way although this may not be very speed effective (roughly 10fps ).
 
 
 ## Background 
@@ -31,4 +33,14 @@ Given the lines are comprised of many overlayed varying radius spheres it is als
 Although the monotone look is more striking it is also possible to colorise the effect. Given the lines already represent intensity the intensity of all colours should be the same high level. This can be achieved by using HSV colours where the 'value' component is set to 1.0 . As seen below
 
 
+<img src="https://github.com/edf1101/Wave-Image-Renderer/blob/main/repoImages/skiier%20colour.png" width="700" height="400">
+
+## Other Examples
+
+<img src="https://github.com/edf1101/Wave-Image-Renderer/blob/main/repoImages/smile.png" width="400" height="400">
+
+<img src="https://github.com/edf1101/Wave-Image-Renderer/blob/main/repoImages/einstein%20bw.png" width="300" height="400">
+
 <img src="https://github.com/edf1101/Wave-Image-Renderer/blob/main/repoImages/color%20waves.png" width="300" height="400">
+
+
