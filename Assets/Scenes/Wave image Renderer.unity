@@ -7797,7 +7797,6 @@ MonoBehaviour:
   radiusHigh: {fileID: 1917984388}
   wlLow: {fileID: 1231816942}
   wlHigh: {fileID: 1353801068}
-  debugTex: {fileID: 0}
 --- !u!114 &1765730601
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityFileBrowser;
+#if PLATFORM_STANDALONE_OSX
+using NativeFileDialogSharp;
+#endif
 
 /* 
  * Code by Ed F
@@ -15,8 +18,23 @@ public class imageFileHandler
     // opens a dialog user selects image and the render texture gets returned
     public static RenderTexture importImage()
     {
-    
-        string path = FileBrowser.OpenFileBrowser(new[] { "png", "jpg","jpeg" })[0];
+
+        string path = "";
+
+        // handle osx options
+#if PLATFORM_STANDALONE_OSX
+        path = NativeFileDialogSharp.Dialog.FileOpen(filterList: "jpg,jpeg,png").Path;
+#endif
+
+
+
+        // handle windows options
+
+
+
+#if PLATFORM_STANDALONE_WIN
+        path = FileBrowser.OpenFileBrowser(new string[] { "jpg","jpeg", "png" })[0];
+#endif
 
         Debug.Log(path);
 
@@ -44,8 +62,19 @@ public class imageFileHandler
     public static void saveImage(RenderTexture _rt)
     {
         Debug.Log("saving");
+        string path = "";
+#if PLATFORM_STANDALONE_OSX
+        path = NativeFileDialogSharp.Dialog.FileSave(filterList:"jpg,jpeg,png").Path;
+#endif
+
+       
+
         
-        string path = FileBrowser.SaveFileBrowser(extensions:new[] { "png", "jpg" });
+
+        // windows options
+#if PLATFORM_STANDALONE_WIN
+        path = FileBrowser.SaveFileBrowser(extensions:new[] { "png", "jpg" });
+#endif
         Debug.Log(path);
         SaveTexture(_rt, path);
     }
