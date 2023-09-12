@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using UnityFileBrowser;
+using SFB;
 #if PLATFORM_STANDALONE_OSX
 using NativeFileDialogSharp;
 #endif
@@ -22,19 +22,20 @@ public class imageFileHandler
         string path = "";
 
         // handle osx options
-#if PLATFORM_STANDALONE_OSX
+        #if PLATFORM_STANDALONE_OSX
         path = NativeFileDialogSharp.Dialog.FileOpen(filterList: "jpg,jpeg,png").Path;
-#endif
+        #endif
 
 
 
         // handle windows options
 
 
+        var extensions = new[] {new ExtensionFilter("Image Files", "png", "jpg", "jpeg" )};
 
-#if PLATFORM_STANDALONE_WIN
-        path = FileBrowser.OpenFileBrowser(new string[] { "jpg","jpeg", "png" })[0];
-#endif
+        #if PLATFORM_STANDALONE_WIN
+        path = SFB.StandaloneFileBrowser.OpenFilePanel("Open Files", "", extensions, false)[0];
+        #endif
 
         Debug.Log(path);
 
@@ -63,18 +64,20 @@ public class imageFileHandler
     {
         Debug.Log("saving");
         string path = "";
-#if PLATFORM_STANDALONE_OSX
+        #if PLATFORM_STANDALONE_OSX
         path = NativeFileDialogSharp.Dialog.FileSave(filterList:"jpg,jpeg,png").Path;
-#endif
+        #endif
 
-       
 
-        
+
+
 
         // windows options
-#if PLATFORM_STANDALONE_WIN
-        path = FileBrowser.SaveFileBrowser(extensions:new[] { "png", "jpg" });
-#endif
+        #if PLATFORM_STANDALONE_WIN
+        var extensions = new[] { new ExtensionFilter("Image Files", "png", "jpg", "jpeg") };
+
+        path = StandaloneFileBrowser.SaveFilePanel("Save File", "", "Untitled", extensions);
+        #endif
         Debug.Log(path);
         SaveTexture(_rt, path);
     }
