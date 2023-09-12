@@ -22,7 +22,7 @@ float minY; // minimum yIntercept
 float waveAmplitude; // amplitude of sinWaves
 
 // draws a circle at a point on screen
-void drawCircle(int2 position,float radius,float4 color){
+void drawCircle(float2 position,float radius,float4 color){
 
     // multiply position and radius by canvas upscale ratio so they scale automatically
     position*=canvasMult;
@@ -123,7 +123,7 @@ void setBackground (uint3 id : SV_DispatchThreadID)
 }
 
 
-[numthreads(1,1,1)]
+[numthreads(16,1,1)]
 void mainLines (uint3 id : SV_DispatchThreadID)
 {
     float startYIntercept = minY+ (id.x*lineIntervals); // where it starts at

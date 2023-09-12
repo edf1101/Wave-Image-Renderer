@@ -133,7 +133,7 @@ public class lineRendererHelper
         myShader.SetFloat("minY", getMinY());
         myShader.SetFloat("lineIntervals", temporaryIntervals);
 
-        myShader.Dispatch(1, lineCount, 100 , 1); // dispatch it
+        myShader.Dispatch(1, Mathf.CeilToInt(lineCount/16f), 1 , 1); // dispatch it
 
 
         return outputImage;
