@@ -39,6 +39,8 @@ Although the monotone look is more striking it is also possible to colorise the 
 
 <img src="https://github.com/edf1101/Wave-Image-Renderer/blob/main/repoImages/smile.png" width="400" height="400">
 
+<img src="https://github.com/edf1101/Wave-Image-Renderer/blob/main/repoImages/Screenshot%202023-09-09%20at%2021.45.10.png" width="400" height="400">
+
 <img src="https://github.com/edf1101/Wave-Image-Renderer/blob/main/repoImages/einstein%20bw.png" width="300" height="400">
 
 <img src="https://github.com/edf1101/Wave-Image-Renderer/blob/main/repoImages/color%20waves.png" width="300" height="400">
